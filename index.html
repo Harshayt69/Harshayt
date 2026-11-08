@@ -2,57 +2,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>About:Blank Embedder</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About:Blank Embedder</title>
 </head>
 <body>
 
 <button id="embedButton">embed about:blank</button>
 
 <script>
-  const enteredUrl = prompt("url?");
-  let targetUrl = null;
+    // Ask for the URL when the page opens
+    const enteredUrl = prompt("url?");
+    let targetUrl = null;
 
-  if (enteredUrl && enteredUrl.trim()) {
-    try {
-      const parsedUrl = new URL(enteredUrl.trim());
+    if (enteredUrl && enteredUrl.trim()) {
+        try {
+            const parsedUrl = new URL(enteredUrl.trim());
 
-      if (parsedUrl.protocol === "https:" ||
-          parsedUrl.protocol === "http:") {
-        targetUrl = parsedUrl.href;
-      } else {
-        alert("Enter a URL starting with https:// or http://");
-      }
-    } catch {
-      alert("Please enter a valid URL.");
-    }
-  }
-
-  document.getElementById("embedButton").onclick = function () {
-    if (!targetUrl) {
-      alert("Reload the page and enter a valid URL.");
-      return;
+            if (parsedUrl.protocol === "https:" ||
+                parsedUrl.protocol === "http:") {
+                targetUrl = parsedUrl.href;
+            } else {
+                alert("Enter a URL starting with https:// or http://");
+            }
+        } catch {
+            alert("Please enter a valid URL.");
+        }
     }
 
-    const win = window.open("about:blank", "_blank");
+    document.getElementById("embedButton").onclick = function () {
+        if (!targetUrl) {
+            alert("Reload the page and enter a valid URL.");
+            return;
+        }
 
-    if (!win) {
-      alert("Pop-up blocked. Allow pop-ups and try again.");
-      return;
-    }
+        const win = window.open("about:blank", "_blank");
 
-    win.document.title = " ";
-    win.document.body.style.margin = "0";
+        if (!win) {
+            alert("Pop-up blocked. Allow pop-ups and try again.");
+            return;
+        }
 
-    const iframe = win.document.createElement("iframe");
-    iframe.src = targetUrl;
-    iframe.style.border = "none";
-    iframe.style.width = "100%";
-    iframe.style.height = "100vh";
+        win.document.title = " ";
+        win.document.body.style.margin = "0";
+        win.document.body.style.height = "100vh";
 
-    win.document.body.appendChild(iframe);
-  };
+        const iframe = win.document.createElement("iframe");
+
+        iframe.src = targetUrl;
+        iframe.style.border = "none";
+        iframe.style.width = "100%";
+        iframe.style.height = "100%";
+        iframe.style.margin = "0";
+
+        win.document.body.appendChild(iframe);
+    };
 </script>
 
 </body>
