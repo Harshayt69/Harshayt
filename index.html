@@ -1,41 +1,102 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Harshayt Embedder</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111827;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .box {
+      background: #1f2937;
+      padding: 25px;
+      border-radius: 12px;
+      width: 300px;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 12px;
+      box-sizing: border-box;
+    }
+
+    button {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
 </head>
+
 <body>
 
+<div class="box">
+  <h2>Harshayt Embedder</h2>
+
+  <input id="url" placeholder="Enter website URL">
+
+  <button id="embed">Embed about:blank</button>
+
+  <p id="message"></p>
+</div>
+
 <script>
-  const enteredUrl = prompt("url?");
+document.getElementById("embed").addEventListener("click", function() {
+  let address = document.getElementById("url").value.trim();
+  const message = document.getElementById("message");
 
-  if (enteredUrl && enteredUrl.trim()) {
-    try {
-      const url = new URL(enteredUrl.trim());
-
-      if (url.protocol !== "https:" &&
-          url.protocol !== "http:") {
-        throw new Error();
-      }
-
-      const win = window.open("about:blank", "_blank");
-
-      if (!win) {
-        alert("Please allow pop-ups for this website.");
-      } else {
-        win.document.title = " ";
-        win.document.body.style.margin = "0";
-
-        const iframe = win.document.createElement("iframe");
-        iframe.src = url.href;
-        iframe.style.cssText =
-          "width:100%;height:100vh;border:0;";
-
-        win.document.body.appendChild(iframe);
-      }
-    } catch {
-      alert("Please enter a valid website URL.");
-    }
+  if (!address) {
+    message.textContent = "Enter a URL first.";
+    return;
   }
+
+  if (!/^https?:\/\//i.test(address)) {
+    address = "https://" + address;
+  }
+
+  let target;
+
+  try {
+    target = new URL(address);
+
+    if (!["http:", "https:"].includes(target.protocol)) {
+      throw new Error();
+    }
+  } catch {
+    message.textContent = "Invalid URL.";
+    return;
+  }
+
+  const win = window.open("about:blank", "_blank");
+
+  if (!win) {
+    message.textContent = "Chrome blocked the popup.";
+    return;
+  }
+
+  win.document.title = " ";
+  win.document.body.style.margin = "0";
+
+  const frame = win.document.createElement("iframe");
+  frame.src = target.href;
+  frame.style.cssText =
+    "width:100%;height:100vh;border:0;";
+
+  win.document.body.appendChild(frame);
+});
 </script>
 
 </body>
