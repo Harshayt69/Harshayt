@@ -3,53 +3,47 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Harshayt Embedder</title>
 </head>
 <body>
 <script>
-(() => {
-  const url = prompt("Enter the website URL:");
+const url = prompt("Enter the website URL:");
 
-  if (!url || !url.trim()) {
-    document.body.textContent = "No URL entered.";
-    return;
-  }
-
+if (url && url.trim()) {
   let target;
 
   try {
     target = new URL(url.trim());
-    if (!["http:", "https:"].includes(target.protocol)) {
-      throw new Error("Invalid protocol");
+
+    if (!["https:", "http:"].includes(target.protocol)) {
+      throw new Error();
     }
+
+    document.body.innerHTML = `
+      <h2>Harshayt Embedder</h2>
+      <button id="open">Open in about:blank</button>
+    `;
+
+    document.getElementById("open").onclick = () => {
+      const newTab = window.open("about:blank", "_blank");
+
+      if (!newTab) {
+        alert("Allow pop-ups for this website.");
+        return;
+      }
+
+      const iframe = newTab.document.createElement("iframe");
+      iframe.src = target.href;
+      iframe.style.cssText =
+        "width:100%;height:100%;border:0;position:fixed;inset:0";
+
+      newTab.document.body.style.margin = "0";
+      newTab.document.body.appendChild(iframe);
+    };
   } catch {
-    alert("Please enter a valid URL starting with https:// or http://");
-    return;
+    alert("Enter a valid http:// or https:// URL.");
   }
-
-  document.body.innerHTML = `
-    <h3>Ready to open your website</h3>
-    <button id="open">Open in about:blank</button>
-  `;
-
-  document.getElementById("open").addEventListener("click", () => {
-    const win = window.open("about:blank", "_blank");
-
-    if (!win) {
-      alert("Pop-up blocked. Allow pop-ups for this website in Chrome.");
-      return;
-    }
-
-    const iframe = win.document.createElement("iframe");
-    iframe.src = target.href;
-    iframe.style.cssText =
-      "position:fixed;inset:0;width:100%;height:100%;border:0";
-
-    win.document.body.style.margin = "0";
-    win.document.body.appendChild(iframe);
-  });
-})();
+}
 </script>
 </body>
 </html>
