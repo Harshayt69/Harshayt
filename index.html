@@ -1,115 +1,59 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>About:Blank Embedder</title>
-  <style>
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: Arial, sans-serif;
-      background: #111827;
-      color: white;
-    }
-
-    .overlay {
-      position: fixed;
-      inset: 0;
-      display: grid;
-      place-items: center;
-      padding: 20px;
-      background: rgba(0,0,0,.65);
-    }
-
-    .popup {
-      width: min(440px, 100%);
-      padding: 28px;
-      border-radius: 14px;
-      background: #1f2937;
-    }
-
-    input, button {
-      width: 100%;
-      padding: 13px;
-      margin-top: 12px;
-      border-radius: 8px;
-      font-size: 16px;
-    }
-
-    input {
-      border: 1px solid #64748b;
-      background: #111827;
-      color: white;
-    }
-
-    button {
-      border: 0;
-      background: #3b82f6;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    #message { color: #fca5a5; }
-  </style>
 </head>
 <body>
 
-  <main class="overlay">
-    <section class="popup">
-      <h1>About:Blank Embedder</h1>
-      <p>Paste a website address below.</p>
+<button id="embedButton">embed about:blank</button>
 
-      <form id="embedForm">
-        <input id="websiteUrl" placeholder="https://example.com" required>
-        <button type="submit">Embed</button>
-      </form>
+<script>
+  const enteredUrl = prompt("url?");
+  let targetUrl = null;
 
-      <p id="message"></p>
-    </section>
-  </main>
+  if (enteredUrl && enteredUrl.trim()) {
+    try {
+      const parsedUrl = new URL(enteredUrl.trim());
 
-  <script>
-    const form = document.getElementById("embedForm");
-    const input = document.getElementById("websiteUrl");
-    const message = document.getElementById("message");
-
-    form.addEventListener("submit", function(event) {
-      event.preventDefault();
-
-      let address = input.value.trim();
-
-      if (!/^https?:\/\//i.test(address)) {
-        address = "https://" + address;
+      if (parsedUrl.protocol === "https:" ||
+          parsedUrl.protocol === "http:") {
+        targetUrl = parsedUrl.href;
+      } else {
+        alert("Enter a URL starting with https:// or http://");
       }
+    } catch {
+      alert("Please enter a valid URL.");
+    }
+  }
 
-      let parsed;
+  document.getElementById("embedButton").onclick = function () {
+    if (!targetUrl) {
+      alert("Reload the page and enter a valid URL.");
+      return;
+    }
 
-      try {
-        parsed = new URL(address);
-      } catch {
-        message.textContent = "Invalid website address.";
-        return;
-      }
+    const win = window.open("about:blank", "_blank");
 
-      if (!["http:", "https:"].includes(parsed.protocol)) {
-        message.textContent = "Use an http or https address.";
-        return;
-      }
+    if (!win) {
+      alert("Pop-up blocked. Allow pop-ups and try again.");
+      return;
+    }
 
-      const frame = document.createElement("iframe");
+    win.document.title = " ";
+    win.document.body.style.margin = "0";
 
-      frame.src = parsed.href;
-      frame.title = "Embedded website";
-      frame.style.cssText =
-        "position:fixed;inset:0;width:100%;height:100%;border:0;background:white;";
+    const iframe = win.document.createElement("iframe");
+    iframe.src = targetUrl;
+    iframe.style.border = "none";
+    iframe.style.width = "100%";
+    iframe.style.height = "100vh";
 
-      document.body.replaceChildren(frame);
-    });
-  </script>
+    win.document.body.appendChild(iframe);
+  };
+</script>
 
 </body>
 </html>
